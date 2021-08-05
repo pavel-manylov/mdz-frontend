@@ -14,9 +14,11 @@ interface ComponentSubFormProps {
     onMoveUp(component: Component | NewComponent): void;
 
     onMoveDown(component: Component | NewComponent): void;
+
+    onDelete(component: Component | NewComponent): void;
 }
 
-export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown}: ComponentSubFormProps) {
+export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown, onDelete}: ComponentSubFormProps) {
     const [value, setValue] = useState<string | boolean | PostReference[] | undefined>(component.value);
     const [displayClass, setDisplayClass] = useState<string>(component.display_class || '');
     const [_public, setPublic] = useState<boolean>(!!component.public);
@@ -37,7 +39,8 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown}: Co
     } else if (component.type === "boolean") {
         valueComponent = <ComponentBooleanValueComponent value={!!value} onChange={setValue}/>;
     } else if (component.type === "relation") {
-        valueComponent = <ComponentRelationValueComponent value={(value || []) as PostReference[]} onChange={setValue}/>;
+        valueComponent =
+            <ComponentRelationValueComponent value={(value || []) as PostReference[]} onChange={setValue}/>;
     }
 
     const titles = {
@@ -84,6 +87,7 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown}: Co
                 <ButtonGroup>
                     <Button variant="outline-secondary" onClick={e => onMoveUp(component)}>Вверх</Button>
                     <Button variant="outline-secondary" onClick={e => onMoveDown(component)}>Вниз</Button>
+                    <Button variant="outline-danger" onClick={e => onDelete(component)}>Удалить</Button>
                 </ButtonGroup>
             </Card.Footer>
         </Card>
