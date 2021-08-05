@@ -1,13 +1,16 @@
 import React, {useState} from "react";
 import {Alert, Button, Col, Form} from "react-bootstrap";
-import {NewPost} from "./api";
+import {Component, NewComponent, NewComponentTypeEnum, NewPost} from "./api";
 import Config from "./Config";
+import {ComponentSubForm} from "./ComponentSubForm";
 
 export function CreatePost() {
     const [name, setName] = useState("");
     const [seoUrl, setSeoUrl] = useState("");
     const [saved, setSaved] = useState(false);
-    const [saveError, setSaveError] = useState<string | undefined>("");
+    const [saveError, setSaveError] = useState<string>("");
+
+    const [components, setComponents] = useState<NewComponent[]>([]);
 
     async function save() {
         if (name === "" || seoUrl === "") {
@@ -19,7 +22,12 @@ export function CreatePost() {
         const post: NewPost = {name: name, seo_url: seoUrl};
 
         try {
-            await Config.postApi.createPost(post);
+            const postResponse = await Config.postApi.createPost(post);
+
+            for(const component of components) {
+                await Config.componentApi.createComponent(postResponse.data.id as number, component);
+            }
+
             setSaved(true);
         } catch (e) {
             if (e.response && e.response.status === 422) {
@@ -31,6 +39,21 @@ export function CreatePost() {
             setSaved(false);
         }
 
+    }
+
+    function addStringComponent() {
+        setComponents([...components, {
+            order: 0,
+            type: NewComponentTypeEnum.String,
+            value: "Ру",
+            custom_fields: {},
+            public: true
+        }]);
+    }
+
+    function componentChanged(index: number, component: Component | NewComponent) {
+        components[index] = component as NewComponent;
+        setComponents(components)
     }
 
     return (
@@ -57,6 +80,15 @@ export function CreatePost() {
                     <Form.Control placeholder="amazon-fires-all-the-people" value={seoUrl}
                                   onChange={e => setSeoUrl(e.target.value)}/>
                 </Form.Group>
+
+                {components.map((component, i) =>
+                    <ComponentSubForm key={i}
+                                      component={component}
+                                      onChange={(c) => componentChanged(i, c) }
+                    />)
+                }
+
+                <Button variant="secondary" onClick={addStringComponent}>Добавить строковый компонент</Button> <br/>
                 <Button variant="primary" onClick={save}>Создать</Button>
             </Form>
         </div>
