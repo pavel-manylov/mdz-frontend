@@ -1,8 +1,9 @@
 import React, {useState} from "react";
-import {Alert, Button, Col, Form} from "react-bootstrap";
+import {Alert, Button, Col, Form, Row} from "react-bootstrap";
 import {NewComponent, NewPost} from "./api";
 import Config from "./Config";
 import {ComponentsForm} from "./ComponentsForm";
+import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 
 export function CreatePost() {
     const [name, setName] = useState("");
@@ -45,30 +46,38 @@ export function CreatePost() {
         <div>
             <h1>Создание новой публикации</h1>
             <Alert show={saved} variant="success">
-                <Alert.Heading>Создание публикации</Alert.Heading>
                 <p>Публикация успешно создана</p>
             </Alert>
 
-            <Alert show={saveError !== ""} variant="success">
-                <Alert.Heading>Создание публикации</Alert.Heading>
+            <Alert show={saveError !== ""} variant="danger">
                 <p>{saveError}</p>
             </Alert>
 
             <Form>
-                <Form.Group as={Col} controlId="name">
-                    <Form.Label>Внутреннее название публикации</Form.Label>
-                    <Form.Control placeholder="Amazon увольняет всех сотрудников" value={name}
-                                  onChange={e => setName(e.target.value)}/>
+                <Form.Group as={Row} controlId="name">
+                    <Form.Label column sm={2}>Внутреннее название публикации</Form.Label>
+                    <Col sm={10}>
+                        <Form.Control placeholder="Amazon увольняет всех сотрудников" value={name}
+                                      onChange={e => setName(e.target.value)}/>
+                    </Col>
                 </Form.Group>
-                <Form.Group as={Col} controlId="seoUrl">
-                    <Form.Label>Человекочитаемый URL</Form.Label>
-                    <Form.Control placeholder="amazon-fires-all-the-people" value={seoUrl}
-                                  onChange={e => setSeoUrl(e.target.value)}/>
+
+                <Form.Group as={Row} controlId="seoUrl">
+                    <Form.Label column sm={2}>Человекочитаемый URL</Form.Label>
+                    <Col sm={10}>
+                        <Form.Control placeholder="amazon-fires-all-the-people" value={seoUrl}
+                                      onChange={e => setSeoUrl(e.target.value)}/>
+                    </Col>
                 </Form.Group>
 
                 <ComponentsForm components={components} onChange={setComponents}/>
 
-                <Button variant="primary" onClick={save}>Создать</Button>
+                <Row className="mt-3">
+                    <Col>
+                        <Button variant="primary" onClick={save}>Создать</Button>
+                    </Col>
+                </Row>
+
             </Form>
         </div>
     )

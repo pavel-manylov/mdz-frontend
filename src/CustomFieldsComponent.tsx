@@ -50,34 +50,33 @@ export function CustomFieldsComponent({customFields, onChange}: CustomFieldsComp
     return (
         <div>
             {Object.keys(updatedCustomFields).map((key, index) =>
-                <Row key={index}>
-                    <Col>
+                <Row key={index} className="mb-2">
+                    <Col sm={5}>
                         <FormControl placeholder="Ключ" value={key} onChange={e => updateName(key, e.target.value)}/>
                     </Col>
-                    <Col>
+                    <Col sm={5}>
                         <FormControl placeholder="Значение" value={updatedCustomFields[key]}
                                      onChange={e => updateValue(key, e.target.value)}/>
                     </Col>
-                    <Col>
-                        <Button variant="secondary" onClick={e => remove(key)}>Удалить</Button>
+                    <Col sm={2}>
+                        <Button variant="outline-danger" onClick={e => remove(key)}>Удалить</Button>
                     </Col>
                 </Row>
             )}
 
-            <h4>Новое поле</h4>
             <Row>
-                <Col>
+                <Col sm={5}>
                     <FormControl placeholder="Ключ" value={newFieldName} onChange={e => {
                         setNewFieldName(e.target.value);
                     }}/>
                 </Col>
-                <Col>
+                <Col sm={5}>
                     <FormControl placeholder="Значение" value={newFieldValue} onChange={e => {
                         setNewFieldValue(e.target.value);
                     }}/>
                 </Col>
-                <Col>
-                    <Button variant="secondary" onClick={addNewField} disabled={newFieldName === "" || newFieldValue === ""}>Добавить</Button>
+                <Col sm={2}>
+                    <Button variant="outline-secondary" onClick={addNewField} disabled={newFieldName === "" || newFieldValue === ""}>Добавить</Button>
                 </Col>
             </Row>
         </div>
