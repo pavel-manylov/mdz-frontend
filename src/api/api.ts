@@ -42,7 +42,7 @@ export interface Component {
      * @type {boolean}
      * @memberof Component
      */
-    _public?: boolean;
+    public?: boolean;
     /**
      * Тип значения компонента (строка, булево, вложения)
      * @type {string}
@@ -96,7 +96,7 @@ export interface NewComponent {
      * @type {boolean}
      * @memberof NewComponent
      */
-    _public?: boolean;
+    public?: boolean;
     /**
      * Тип значения компонента (строка, булево, вложения)
      * @type {string}
