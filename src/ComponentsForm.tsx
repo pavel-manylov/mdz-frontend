@@ -1,22 +1,22 @@
 import React, {useEffect, useState} from "react";
 import {Component, NewComponent, NewComponentTypeEnum, PostReference} from "./api";
 import {ComponentSubForm} from "./ComponentSubForm";
-import {Button, ButtonGroup, Col, Dropdown, DropdownButton, Row} from "react-bootstrap";
+import {Button, ButtonGroup, Col, Dropdown, Row} from "react-bootstrap";
 import {v4 as uuid} from 'uuid';
 
 interface ComponentsFormParams {
-    components: NewComponent[];
+    components: (Component|NewComponent)[];
 
-    onChange(components: NewComponent[]): void;
+    onChange(components: (Component|NewComponent)[]): void;
 }
 
-interface NewComponentWithKey {
-    component: NewComponent;
+interface ComponentWithKey {
+    component: NewComponent | Component;
     key: string;
 }
 
 export function ComponentsForm({components: initialComponents, onChange}: ComponentsFormParams) {
-    const [componentsWithKey, setComponentsWithKey] = useState<NewComponentWithKey[]>(
+    const [componentsWithKey, setComponentsWithKey] = useState<ComponentWithKey[]>(
         initialComponents.map(c => {
             return {component: c, key: uuid()}
         })
@@ -47,19 +47,19 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
         addComponent(NewComponentTypeEnum.Relation, [] as PostReference[]);
     }
 
-    function sortByOrder(componentsWithKey: NewComponentWithKey[]) {
+    function sortByOrder(componentsWithKey: ComponentWithKey[]) {
         componentsWithKey.sort((a, b) => (a.component.order || 0) - (b.component.order || 0));
     }
 
     function componentChanged(index: number, component: Component | NewComponent) {
-        let newComponentsWithKey: NewComponentWithKey[] = [...componentsWithKey];
+        let newComponentsWithKey: ComponentWithKey[] = [...componentsWithKey];
         newComponentsWithKey[index] = {component: component as NewComponent, key: componentsWithKey[index].key};
         sortByOrder(newComponentsWithKey);
         setComponentsWithKey(newComponentsWithKey);
     }
 
     function moveComponent(index: number, newIndex: number) {
-        let newComponentsWithKey: NewComponentWithKey[] = [...componentsWithKey];
+        let newComponentsWithKey: ComponentWithKey[] = [...componentsWithKey];
 
         const component = newComponentsWithKey[index];
         newComponentsWithKey.splice(index, 1);
