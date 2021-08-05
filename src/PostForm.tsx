@@ -18,6 +18,7 @@ export function PostForm({saveText, post, components: initialComponents, onSaveS
     const [name, setName] = useState(post.name);
     const [seoUrl, setSeoUrl] = useState(post.seo_url);
     const [components, setComponents] = useState<(Component | NewComponent)[]>(initialComponents);
+    const [componentsToDelete, setComponentsToDelete] = useState<Component[]>([]);
 
     async function save() {
         if (name === "" || seoUrl === "") {
@@ -46,6 +47,10 @@ export function PostForm({saveText, post, components: initialComponents, onSaveS
 
             }
 
+            for(const componentToDelete of componentsToDelete){
+                await Config.componentApi.deleteComponent(postResponse.data.id as number, componentToDelete.id as number);
+            }
+
             onSaveSuccess(postResponse.data);
         } catch (e) {
             if (e.response && e.response.status === 422) {
@@ -53,6 +58,14 @@ export function PostForm({saveText, post, components: initialComponents, onSaveS
             } else {
                 onSaveError("Произошла ошибка во время создания публикации");
             }
+        }
+    }
+
+    function addComponentToDeleteList(component: NewComponent | Component){
+        if ("id" in component) {
+            let updatedComponentsToDelete = [...componentsToDelete];
+            updatedComponentsToDelete.push(component as Component);
+            setComponentsToDelete(updatedComponentsToDelete);
         }
     }
 
@@ -75,7 +88,7 @@ export function PostForm({saveText, post, components: initialComponents, onSaveS
                     </Col>
                 </Form.Group>
 
-                <ComponentsForm components={components} onChange={setComponents}/>
+                <ComponentsForm components={components} onChange={setComponents} onDelete={addComponentToDeleteList}/>
 
                 <Row className="mt-3">
                     <Col>

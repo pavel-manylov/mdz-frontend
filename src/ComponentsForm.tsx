@@ -5,9 +5,11 @@ import {Button, ButtonGroup, Col, Dropdown, Row} from "react-bootstrap";
 import {v4 as uuid} from 'uuid';
 
 interface ComponentsFormParams {
-    components: (Component|NewComponent)[];
+    components: (Component | NewComponent)[];
 
-    onChange(components: (Component|NewComponent)[]): void;
+    onChange(components: (Component | NewComponent)[]): void;
+
+    onDelete(component: Component | NewComponent): void;
 }
 
 interface ComponentWithKey {
@@ -15,7 +17,7 @@ interface ComponentWithKey {
     key: string;
 }
 
-export function ComponentsForm({components: initialComponents, onChange}: ComponentsFormParams) {
+export function ComponentsForm({components: initialComponents, onChange, onDelete}: ComponentsFormParams) {
     const [componentsWithKey, setComponentsWithKey] = useState<ComponentWithKey[]>(
         initialComponents.map(c => {
             return {component: c, key: uuid()}
@@ -76,6 +78,16 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
         moveComponent(index, index - 1);
     }
 
+    function deleteComponent(index: number) {
+        const componentToDelete = componentsWithKey[index].component;
+
+        let updatedComponentsWithKey = [...componentsWithKey];
+        updatedComponentsWithKey.splice(index, 1);
+        setComponentsWithKey(updatedComponentsWithKey);
+
+        onDelete(componentToDelete);
+    }
+
     useEffect(() => {
         onChange(componentsWithKey.map(c => c.component));
     }, [componentsWithKey, onChange]);
@@ -85,8 +97,9 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
             <ComponentSubForm key={componentWithKey.key}
                               component={componentWithKey.component}
                               onChange={(c) => componentChanged(i, c)}
-                              onMoveUp={c => moveUp(i)}
-                              onMoveDown={c => moveDown(i)}
+                              onMoveUp={() => moveUp(i)}
+                              onMoveDown={() => moveDown(i)}
+                              onDelete={() => deleteComponent(i)}
             />)}
 
         <Row>
@@ -97,8 +110,14 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
                     <Dropdown.Toggle split variant="outline-secondary" id="dropdown-split-basic"/>
 
                     <Dropdown.Menu>
-                        <Dropdown.Item as="button" onClick={ e => { addBooleanComponent(); e.preventDefault(); }}>Добавить булево значение</Dropdown.Item>
-                        <Dropdown.Item as="button" onClick={ e => { addRelationComponent(); e.preventDefault(); }}>Добавить вложения</Dropdown.Item>
+                        <Dropdown.Item as="button" onClick={e => {
+                            addBooleanComponent();
+                            e.preventDefault();
+                        }}>Добавить булево значение</Dropdown.Item>
+                        <Dropdown.Item as="button" onClick={e => {
+                            addRelationComponent();
+                            e.preventDefault();
+                        }}>Добавить вложения</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </Col>
