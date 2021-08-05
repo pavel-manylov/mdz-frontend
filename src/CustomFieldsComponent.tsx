@@ -15,7 +15,7 @@ export function CustomFieldsComponent({customFields, onChange}: CustomFieldsComp
     const [newFieldValue, setNewFieldValue] = useState<string>("");
 
     function updateName(oldName: string, newName: string) {
-        let updated: CustomFields = Object.assign({}, updatedCustomFields);
+        let updated: CustomFields = {...updatedCustomFields};
         const value = updated[oldName];
         delete updated[oldName];
         updated[newName] = value;
@@ -23,19 +23,19 @@ export function CustomFieldsComponent({customFields, onChange}: CustomFieldsComp
     }
 
     function updateValue(name: string, newValue: string) {
-        let updated: CustomFields = Object.assign({}, updatedCustomFields);
+        let updated: CustomFields = {...updatedCustomFields};
         updated[name] = newValue;
         setUpdatedCustomFields(updated);
     }
 
     function remove(name: string) {
-        let updated: CustomFields = Object.assign({}, updatedCustomFields);
+        let updated: CustomFields = {...updatedCustomFields};
         delete updated[name];
         setUpdatedCustomFields(updated);
     }
 
     function addNewField() {
-        let updated: CustomFields = Object.assign({}, updatedCustomFields);
+        let updated: CustomFields = {...updatedCustomFields};
         updated[newFieldName] = newFieldValue;
         setUpdatedCustomFields(updated);
 
@@ -76,7 +76,8 @@ export function CustomFieldsComponent({customFields, onChange}: CustomFieldsComp
                     }}/>
                 </Col>
                 <Col sm={2}>
-                    <Button variant="outline-secondary" onClick={addNewField} disabled={newFieldName === "" || newFieldValue === ""}>Добавить</Button>
+                    <Button variant="outline-secondary" onClick={addNewField}
+                            disabled={newFieldName === "" || newFieldValue === ""}>Добавить</Button>
                 </Col>
             </Row>
         </div>

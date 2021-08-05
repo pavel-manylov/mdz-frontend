@@ -1,9 +1,8 @@
 import React from 'react';
 import './App.css';
-import {Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import {CreatePost} from "./CreatePost";
 import {PostsIndex} from "./PostsIndex";
-import {Home} from "./Home";
 import {EditPost} from "./EditPost";
 import {Container, Nav, Navbar} from 'react-bootstrap';
 
@@ -15,6 +14,7 @@ function App() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
+                        <Nav.Link href="/posts/">Все публикации</Nav.Link>
                         <Nav.Link href="/posts/create">Новая публикация</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
@@ -31,7 +31,7 @@ function App() {
                     <PostsIndex/>
                 </Route>
                 <Route path="/">
-                    <Home/>
+                    <Redirect to="/posts"/>
                 </Route>
             </Switch>
         </Container>
