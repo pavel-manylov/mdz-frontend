@@ -25,7 +25,7 @@ export function ComponentRelationValueComponent({value, onChange}: ComponentRela
         });
 
         onChange(postReferences);
-    }, [stringValue])
+    }, [stringValue, onChange])
 
     return (
         <Form.Control value={stringValue} placeholder="идентификаторы публикаций через запятую" onChange={e => {
