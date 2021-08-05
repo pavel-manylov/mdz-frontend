@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Alert, Button, Col, Form} from "react-bootstrap";
-import {Component, NewComponent, NewComponentTypeEnum, NewPost} from "./api";
+import {Component, NewComponent, NewComponentTypeEnum, NewPost, PostReference} from "./api";
 import Config from "./Config";
 import {ComponentSubForm} from "./ComponentSubForm";
 
@@ -41,7 +41,7 @@ export function CreatePost() {
 
     }
 
-    function addComponent(type: NewComponentTypeEnum, value: string|boolean) {
+    function addComponent(type: NewComponentTypeEnum, value: string|boolean|PostReference[]) {
         setComponents([...components, {
             order: 0,
             type: type,
@@ -57,6 +57,10 @@ export function CreatePost() {
 
     function addBooleanComponent() {
         addComponent(NewComponentTypeEnum.Boolean, true);
+    }
+
+    function addRelationComponent() {
+        addComponent(NewComponentTypeEnum.Relation, [] as PostReference[]);
     }
 
     function componentChanged(index: number, component: Component | NewComponent) {
@@ -98,6 +102,7 @@ export function CreatePost() {
 
                 <Button variant="secondary" onClick={addStringComponent}>Добавить строковый компонент</Button> <br/>
                 <Button variant="secondary" onClick={addBooleanComponent}>Добавить булев компонент</Button> <br/>
+                <Button variant="secondary" onClick={addRelationComponent}>Добавить компонент-вложения</Button> <br/>
                 <Button variant="primary" onClick={save}>Создать</Button>
             </Form>
         </div>

@@ -4,6 +4,7 @@ import {Col, Form, FormGroup} from "react-bootstrap";
 import {CustomFields, CustomFieldsComponent} from "./CustomFieldsComponent";
 import {ComponentBooleanValueComponent} from "./ComponentBooleanValueComponent";
 import {ComponentStringValueComponent} from "./ComponentStringValueComponent";
+import {ComponentRelationValueComponent} from "./ComponentRelationValueComponent";
 
 interface ComponentSubFormProps {
     component: Component | NewComponent;
@@ -33,6 +34,8 @@ export function ComponentSubForm({component, onChange}: ComponentSubFormProps) {
         valueComponent = <ComponentStringValueComponent value={String(value)} onChange={setValue}/>;
     } else if (component.type === "boolean") {
         valueComponent = <ComponentBooleanValueComponent value={!!value} onChange={setValue}/>;
+    } else if (component.type === "relation") {
+        valueComponent = <ComponentRelationValueComponent value={value as PostReference[]} onChange={setValue}/>;
     }
 
     return (
