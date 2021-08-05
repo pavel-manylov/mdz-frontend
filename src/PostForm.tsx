@@ -25,12 +25,12 @@ export function PostForm({saveText, post, components: initialComponents, onSaveS
             return;
         }
 
-        const post: NewPost = {name: name, seo_url: seoUrl};
         post.name = name;
         post.seo_url = seoUrl;
 
         try {
             let postResponse;
+
             if ("id" in post) {
                 postResponse = await Config.postApi.updatePost((post as Post).id as number, post);
             } else {
