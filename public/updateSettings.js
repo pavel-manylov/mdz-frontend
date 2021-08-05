@@ -1,0 +1,1 @@
+window.apiBasePath = "http://mac.mini:3000";
