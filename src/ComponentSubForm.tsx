@@ -37,7 +37,7 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown}: Co
     } else if (component.type === "boolean") {
         valueComponent = <ComponentBooleanValueComponent value={!!value} onChange={setValue}/>;
     } else if (component.type === "relation") {
-        valueComponent = <ComponentRelationValueComponent value={value as PostReference[]} onChange={setValue}/>;
+        valueComponent = <ComponentRelationValueComponent value={(value || []) as PostReference[]} onChange={setValue}/>;
     }
 
     const titles = {
