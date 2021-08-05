@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 import {Alert, Button, Col, Form} from "react-bootstrap";
-import {Component, NewComponent, NewComponentTypeEnum, NewPost, PostReference} from "./api";
+import {NewComponent, NewPost} from "./api";
 import Config from "./Config";
-import {ComponentSubForm} from "./ComponentSubForm";
+import {ComponentsForm} from "./ComponentsForm";
 
 export function CreatePost() {
     const [name, setName] = useState("");
@@ -24,7 +24,7 @@ export function CreatePost() {
         try {
             const postResponse = await Config.postApi.createPost(post);
 
-            for(const component of components) {
+            for (const component of components) {
                 await Config.componentApi.createComponent(postResponse.data.id as number, component);
             }
 
@@ -39,33 +39,6 @@ export function CreatePost() {
             setSaved(false);
         }
 
-    }
-
-    function addComponent(type: NewComponentTypeEnum, value: string|boolean|PostReference[]) {
-        setComponents([...components, {
-            order: 0,
-            type: type,
-            value: value,
-            custom_fields: {},
-            public: true
-        }]);
-    }
-
-    function addStringComponent() {
-        addComponent(NewComponentTypeEnum.String, "");
-    }
-
-    function addBooleanComponent() {
-        addComponent(NewComponentTypeEnum.Boolean, true);
-    }
-
-    function addRelationComponent() {
-        addComponent(NewComponentTypeEnum.Relation, [] as PostReference[]);
-    }
-
-    function componentChanged(index: number, component: Component | NewComponent) {
-        components[index] = component as NewComponent;
-        setComponents(components)
     }
 
     return (
@@ -93,16 +66,8 @@ export function CreatePost() {
                                   onChange={e => setSeoUrl(e.target.value)}/>
                 </Form.Group>
 
-                {components.map((component, i) =>
-                    <ComponentSubForm key={i}
-                                      component={component}
-                                      onChange={(c) => componentChanged(i, c) }
-                    />)
-                }
+                <ComponentsForm components={components} onChange={setComponents}/>
 
-                <Button variant="secondary" onClick={addStringComponent}>Добавить строковый компонент</Button> <br/>
-                <Button variant="secondary" onClick={addBooleanComponent}>Добавить булев компонент</Button> <br/>
-                <Button variant="secondary" onClick={addRelationComponent}>Добавить компонент-вложения</Button> <br/>
                 <Button variant="primary" onClick={save}>Создать</Button>
             </Form>
         </div>
