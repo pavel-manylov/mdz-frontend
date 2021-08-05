@@ -7,13 +7,14 @@ import {ComponentsForm} from "./ComponentsForm";
 interface PostFormProps {
     post: NewPost | Post;
     components: (NewComponent | Component)[];
+    saveText: string;
 
     onSaveSuccess(post: NewPost | Post): void;
 
     onSaveError(errorMessage: string): void;
 }
 
-export function PostForm({post, components: initialComponents, onSaveSuccess, onSaveError}: PostFormProps) {
+export function PostForm({saveText, post, components: initialComponents, onSaveSuccess, onSaveError}: PostFormProps) {
     const [name, setName] = useState(post.name);
     const [seoUrl, setSeoUrl] = useState(post.seo_url);
     const [components, setComponents] = useState<(Component | NewComponent)[]>(initialComponents);
@@ -78,7 +79,7 @@ export function PostForm({post, components: initialComponents, onSaveSuccess, on
 
                 <Row className="mt-3">
                     <Col>
-                        <Button variant="primary" onClick={save}>Создать</Button>
+                        <Button variant="primary" onClick={save}>{saveText}</Button>
                     </Col>
                 </Row>
 

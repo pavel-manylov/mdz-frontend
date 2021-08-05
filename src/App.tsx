@@ -4,7 +4,7 @@ import {Route, Switch} from "react-router-dom";
 import {CreatePost} from "./CreatePost";
 import {PostsIndex} from "./PostsIndex";
 import {Home} from "./Home";
-import {Post} from "./Post";
+import {EditPost} from "./EditPost";
 import {Container, Nav, Navbar} from 'react-bootstrap';
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
                     <CreatePost/>
                 </Route>
                 <Route path="/posts/:id">
-                    <Post/>
+                    <EditPost/>
                 </Route>
                 <Route exact path="/posts">
                     <PostsIndex/>

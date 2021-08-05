@@ -22,6 +22,7 @@ export function CreatePost() {
 
             <PostForm post={newPost}
                       components={newComponents}
+                      saveText="Создать"
                       onSaveSuccess={() => {
                           setSaveError("");
                           setSaveSuccess(true);
