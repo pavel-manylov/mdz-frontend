@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Component, NewComponent, NewComponentTypeEnum, PostReference} from "./api";
 import {ComponentSubForm} from "./ComponentSubForm";
-import {Button} from "react-bootstrap";
+import {Button, ButtonGroup, Col, Dropdown, DropdownButton, Row} from "react-bootstrap";
 import {v4 as uuid} from 'uuid';
 
 interface ComponentsFormParams {
@@ -50,6 +50,7 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
     function sortByOrder(componentsWithKey: NewComponentWithKey[]) {
         componentsWithKey.sort((a, b) => (a.component.order || 0) - (b.component.order || 0));
     }
+
     function componentChanged(index: number, component: Component | NewComponent) {
         let newComponentsWithKey: NewComponentWithKey[] = [...componentsWithKey];
         newComponentsWithKey[index] = {component: component as NewComponent, key: componentsWithKey[index].key};
@@ -68,11 +69,11 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
     }
 
     function moveDown(index: number) {
-        moveComponent(index, index+1);
+        moveComponent(index, index + 1);
     }
 
     function moveUp(index: number) {
-        moveComponent(index, index-1);
+        moveComponent(index, index - 1);
     }
 
     useEffect(() => {
@@ -88,9 +89,19 @@ export function ComponentsForm({components: initialComponents, onChange}: Compon
                               onMoveDown={c => moveDown(i)}
             />)}
 
-        <Button variant="secondary" onClick={addStringComponent}>Добавить строковый компонент</Button> <br/>
-        <Button variant="secondary" onClick={addBooleanComponent}>Добавить булев компонент</Button> <br/>
-        <Button variant="secondary" onClick={addRelationComponent}>Добавить компонент-вложения</Button> <br/>
+        <Row>
+            <Col>
+                <Dropdown as={ButtonGroup}>
+                    <Button variant="outline-secondary" onClick={addStringComponent}>Добавить строку</Button>
 
+                    <Dropdown.Toggle split variant="outline-secondary" id="dropdown-split-basic"/>
+
+                    <Dropdown.Menu>
+                        <Dropdown.Item as="button" onClick={ e => { addBooleanComponent(); e.preventDefault(); }}>Добавить булево значение</Dropdown.Item>
+                        <Dropdown.Item as="button" onClick={ e => { addRelationComponent(); e.preventDefault(); }}>Добавить вложения</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+            </Col>
+        </Row>
     </div>);
 }

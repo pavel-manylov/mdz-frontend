@@ -1,6 +1,6 @@
 import {Component, NewComponent, PostReference} from "./api";
 import React, {useEffect, useState} from "react";
-import {Button, Col, Form, FormGroup} from "react-bootstrap";
+import {Button, ButtonGroup, Card, Col, Form, FormGroup, Row} from "react-bootstrap";
 import {CustomFields, CustomFieldsComponent} from "./CustomFieldsComponent";
 import {ComponentBooleanValueComponent} from "./ComponentBooleanValueComponent";
 import {ComponentStringValueComponent} from "./ComponentStringValueComponent";
@@ -40,30 +40,52 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown}: Co
         valueComponent = <ComponentRelationValueComponent value={value as PostReference[]} onChange={setValue}/>;
     }
 
-    return (
-        <div>
-            <h2>Компонент</h2>
-            <Button onClick={e => onMoveUp(component)}>Вверх</Button>
-            <Button onClick={e => onMoveDown(component)}>Вниз</Button>
-            <FormGroup as={Col} controlId="value">
-                <Form.Label>Значение</Form.Label>
-                {valueComponent}
+    const titles = {
+        string: 'Строковый компонент',
+        boolean: 'Булев компонент (чекбокс)',
+        relation: 'Вложения'
+    };
 
-            </FormGroup>
-            <FormGroup as={Col} controlId="public">
-                <Form.Label>Публичный компонент</Form.Label>
-                <Form.Check type="checkbox" checked={_public} onChange={e => {
-                    setPublic(e.target.checked);
-                }}/>
-            </FormGroup>
-            <FormGroup as={Col} controlId="displayClass">
-                <Form.Label>Класс для отображения на клиенте</Form.Label>
-                <Form.Control value={displayClass} onChange={e => {
-                    setDisplayClass(e.target.value);
-                }}/>
-            </FormGroup>
-            <h3>Настраиваемые поля</h3>
-            <CustomFieldsComponent customFields={customFields} onChange={setCustomFields}/>
-        </div>
+    return (
+        <Card className="mb-4">
+            <Card.Header>{titles[component.type || 'string']}</Card.Header>
+            <Card.Body>
+                <FormGroup as={Row} controlId="value">
+                    <Form.Label column sm={2}>Значение</Form.Label>
+                    <Col sm={10}>
+                        {valueComponent}
+                    </Col>
+                </FormGroup>
+
+                <hr/>
+
+                <FormGroup as={Row} controlId="public">
+                    <Form.Label column sm={2}>Публичный компонент</Form.Label>
+                    <Col sm={10}>
+                        <Form.Check type="checkbox" checked={_public} onChange={e => {
+                            setPublic(e.target.checked);
+                        }}/>
+                    </Col>
+                </FormGroup>
+
+                <FormGroup as={Row} controlId="displayClass">
+                    <Form.Label column sm={2}>Класс для отображения на клиенте</Form.Label>
+                    <Col sm={10}>
+                        <Form.Control value={displayClass} placeholder="header1" onChange={e => {
+                            setDisplayClass(e.target.value);
+                        }}/>
+                    </Col>
+                </FormGroup>
+
+                <hr/>
+                <CustomFieldsComponent customFields={customFields} onChange={setCustomFields}/>
+            </Card.Body>
+            <Card.Footer>
+                <ButtonGroup>
+                    <Button variant="outline-secondary" onClick={e => onMoveUp(component)}>Вверх</Button>
+                    <Button variant="outline-secondary" onClick={e => onMoveDown(component)}>Вниз</Button>
+                </ButtonGroup>
+            </Card.Footer>
+        </Card>
     );
 }
