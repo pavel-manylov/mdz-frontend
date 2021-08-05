@@ -1,7 +1,9 @@
-import {Component, NewComponent} from "./api";
+import {Component, NewComponent, PostReference} from "./api";
 import React, {useEffect, useState} from "react";
 import {Col, Form, FormGroup} from "react-bootstrap";
 import {CustomFields, CustomFieldsComponent} from "./CustomFieldsComponent";
+import {ComponentBooleanValueComponent} from "./ComponentBooleanValueComponent";
+import {ComponentStringValueComponent} from "./ComponentStringValueComponent";
 
 interface ComponentSubFormProps {
     component: Component | NewComponent;
@@ -11,7 +13,7 @@ interface ComponentSubFormProps {
 
 export function ComponentSubForm({component, onChange}: ComponentSubFormProps) {
     const [order, setOrder] = useState<string>(String(component.order));
-    const [value, setValue] = useState<string>(String(component.value));
+    const [value, setValue] = useState<string|boolean|PostReference[]|undefined>(component.value);
     const [displayClass, setDisplayClass] = useState<string>(component.display_class || '');
     const [_public, setPublic] = useState<boolean>(!!component.public);
     const [customFields, setCustomFields] = useState<CustomFields>(component.custom_fields || {});
@@ -23,10 +25,15 @@ export function ComponentSubForm({component, onChange}: ComponentSubFormProps) {
         component.public = _public;
         component.custom_fields = customFields;
 
-        console.log('custom', customFields);
-
         onChange(component);
     });
+
+    let valueComponent: any;
+    if (component.type === "string") {
+        valueComponent = <ComponentStringValueComponent value={String(value)} onChange={setValue}/>;
+    } else if (component.type === "boolean") {
+        valueComponent = <ComponentBooleanValueComponent value={!!value} onChange={setValue}/>;
+    }
 
     return (
         <div>
@@ -39,9 +46,8 @@ export function ComponentSubForm({component, onChange}: ComponentSubFormProps) {
             </FormGroup>
             <FormGroup as={Col} controlId="value">
                 <Form.Label>Значение</Form.Label>
-                <Form.Control as="textarea" value={value} onChange={e => {
-                    setValue(e.target.value);
-                }}/>
+                {valueComponent}
+
             </FormGroup>
             <FormGroup as={Col} controlId="public">
                 <Form.Label>Публичный компонент</Form.Label>

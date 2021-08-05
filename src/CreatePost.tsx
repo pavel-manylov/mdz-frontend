@@ -41,14 +41,22 @@ export function CreatePost() {
 
     }
 
-    function addStringComponent() {
+    function addComponent(type: NewComponentTypeEnum, value: string|boolean) {
         setComponents([...components, {
             order: 0,
-            type: NewComponentTypeEnum.String,
-            value: "Ру",
+            type: type,
+            value: value,
             custom_fields: {},
             public: true
         }]);
+    }
+
+    function addStringComponent() {
+        addComponent(NewComponentTypeEnum.String, "");
+    }
+
+    function addBooleanComponent() {
+        addComponent(NewComponentTypeEnum.Boolean, true);
     }
 
     function componentChanged(index: number, component: Component | NewComponent) {
@@ -89,6 +97,7 @@ export function CreatePost() {
                 }
 
                 <Button variant="secondary" onClick={addStringComponent}>Добавить строковый компонент</Button> <br/>
+                <Button variant="secondary" onClick={addBooleanComponent}>Добавить булев компонент</Button> <br/>
                 <Button variant="primary" onClick={save}>Создать</Button>
             </Form>
         </div>
