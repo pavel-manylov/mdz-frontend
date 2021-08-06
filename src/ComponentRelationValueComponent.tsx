@@ -8,28 +8,43 @@ interface ComponentRelationValueComponentProps {
     onChange(value: PostReference[]): void;
 }
 
-export function ComponentRelationValueComponent({value, onChange}: ComponentRelationValueComponentProps) {
-    const initialValue: string = value.map(r => r.post_id).join(',');
-    const [stringValue, setStringValue] = useState<string>(initialValue);
+export function ComponentRelationValueComponent({value: valueProp, onChange}: ComponentRelationValueComponentProps) {
+    const [stringValue, setStringValue] = useState<string>('');
+    const [referencesValue, setReferencesValue] = useState<PostReference[]>([]);
 
     useEffect(() => {
+        // Синхронизировать, только если извне пришли отличающиеся идентификаторы,
+        // таким образом поддерживаем ситуацию неполного ввода от пользователя (висящая запятая)
+        if (referencesValue.length === valueProp.length &&
+            referencesValue.every((reference, index) => reference.post_id === valueProp[index].post_id)
+        ) return;
+
+        setStringValue(valueProp.map(r => r.post_id).join(','));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [valueProp]);
+
+    function update(rawValue: string) {
         const postReferences: PostReference[] = [];
 
-        stringValue.split(",").forEach((id) => {
+        rawValue.split(",").forEach((id) => {
             const postId = parseInt(id);
-            if(isNaN(postId)) {
+            if (isNaN(postId)) {
                 return null;
             }
 
             postReferences.push({post_id: postId});
         });
 
+        setStringValue(rawValue);
+        setReferencesValue(postReferences);
+
         onChange(postReferences);
-    }, [stringValue, onChange])
+    }
 
     return (
-        <Form.Control value={stringValue} placeholder="идентификаторы публикаций через запятую" onChange={e => {
-            setStringValue(e.target.value);
-        }}/>
+        <Form.Control value={stringValue}
+                      placeholder="идентификаторы публикаций через запятую"
+                      onChange={e => {update(e.target.value);}}
+        />
     )
 }
