@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {Component, NewComponent, Post} from "./api";
-import {PostForm} from "./PostForm";
+import {OldPostForm} from "./OldPostForm";
 import Config from "./Config";
 import {Alert, Button, Spinner} from "react-bootstrap";
 
@@ -53,12 +53,12 @@ export function EditPost() {
                     <Alert show={saveError !== ""} variant="danger">
                         <p>Не удалось сохранить публикацию. {saveError}</p>
                     </Alert>
-                    <PostForm post={post} saveText="Сохранить" components={components}
-                              onSaveSuccess={() => {
+                    <OldPostForm post={post} saveText="Сохранить" components={components}
+                                 onSaveSuccess={() => {
                                   setSaveError("");
                                   setSaveSuccess(true);
                               }}
-                              onSaveError={(errorMessage) => {
+                                 onSaveError={(errorMessage) => {
                                   setSaveError(errorMessage);
                                   setSaveSuccess(false);
                               }}
