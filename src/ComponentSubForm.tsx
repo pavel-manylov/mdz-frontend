@@ -1,7 +1,7 @@
 import {Component, NewComponent, PostReference} from "./api";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Button, ButtonGroup, Card, Col, Form, FormGroup, Row} from "react-bootstrap";
-import {CustomFields, CustomFieldsComponent} from "./CustomFieldsComponent";
+import {CustomFieldsComponent} from "./CustomFieldsComponent";
 import {ComponentBooleanValueComponent} from "./ComponentBooleanValueComponent";
 import {ComponentStringValueComponent} from "./ComponentStringValueComponent";
 import {ComponentRelationValueComponent} from "./ComponentRelationValueComponent";
@@ -19,28 +19,22 @@ interface ComponentSubFormProps {
 }
 
 export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown, onDelete}: ComponentSubFormProps) {
-    const [value, setValue] = useState<string | boolean | PostReference[] | undefined>(component.value);
-    const [displayClass, setDisplayClass] = useState<string>(component.display_class || '');
-    const [_public, setPublic] = useState<boolean>(!!component.public);
-    const [customFields, setCustomFields] = useState<CustomFields>(component.custom_fields || {});
-
-    useEffect(() => {
-        component.value = value;
-        component.display_class = displayClass;
-        component.public = _public;
-        component.custom_fields = customFields;
-
-        onChange(component);
-    }, [value, displayClass, _public, customFields]);
-
     let valueComponent: any;
     if (component.type === "string") {
-        valueComponent = <ComponentStringValueComponent value={String(value)} onChange={setValue}/>;
+        valueComponent = <ComponentStringValueComponent value={String(component.value)}
+                                                        onChange={(newValue) => {
+                                                            onChange({...component, value: newValue})
+                                                        }}/>;
     } else if (component.type === "boolean") {
-        valueComponent = <ComponentBooleanValueComponent value={!!value} onChange={setValue}/>;
+        valueComponent = <ComponentBooleanValueComponent value={!!component.value}
+                                                         onChange={(newValue) => {
+                                                             onChange({...component, value: newValue})
+                                                         }}/>;
     } else if (component.type === "relation") {
-        valueComponent =
-            <ComponentRelationValueComponent value={(value || []) as PostReference[]} onChange={setValue}/>;
+        valueComponent = <ComponentRelationValueComponent value={(component.value || []) as PostReference[]}
+                                                          onChange={(newValue) => {
+                                                              onChange({...component, value: newValue})
+                                                          }}/>;
     }
 
     const titles = {
@@ -65,8 +59,8 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown, onD
                 <FormGroup as={Row} controlId="public">
                     <Form.Label column sm={2}>Публичный компонент</Form.Label>
                     <Col sm={10}>
-                        <Form.Check type="checkbox" checked={_public} onChange={e => {
-                            setPublic(e.target.checked);
+                        <Form.Check type="checkbox" checked={component.public} onChange={e => {
+                            onChange({...component, public: e.target.checked});
                         }}/>
                     </Col>
                 </FormGroup>
@@ -74,20 +68,22 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown, onD
                 <FormGroup as={Row} controlId="displayClass">
                     <Form.Label column sm={2}>Класс для отображения на клиенте</Form.Label>
                     <Col sm={10}>
-                        <Form.Control value={displayClass} placeholder="header1" onChange={e => {
-                            setDisplayClass(e.target.value);
+                        <Form.Control value={component.display_class || ''} placeholder="header1" onChange={e => {
+                            onChange({...component, display_class: e.target.value});
                         }}/>
                     </Col>
                 </FormGroup>
 
                 <hr/>
-                <CustomFieldsComponent customFields={customFields} onChange={setCustomFields}/>
+                <CustomFieldsComponent customFields={component.custom_fields || {}} onChange={(newCustomFields) => {
+                    onChange({...component, custom_fields: newCustomFields})
+                }}/>
             </Card.Body>
             <Card.Footer>
                 <ButtonGroup>
-                    <Button variant="outline-secondary" onClick={e => onMoveUp(component)}>Вверх</Button>
-                    <Button variant="outline-secondary" onClick={e => onMoveDown(component)}>Вниз</Button>
-                    <Button variant="outline-danger" onClick={e => onDelete(component)}>Удалить</Button>
+                    <Button variant="outline-secondary" onClick={() => onMoveUp(component)}>Вверх</Button>
+                    <Button variant="outline-secondary" onClick={() => onMoveDown(component)}>Вниз</Button>
+                    <Button variant="outline-danger" onClick={() => onDelete(component)}>Удалить</Button>
                 </ButtonGroup>
             </Card.Footer>
         </Card>

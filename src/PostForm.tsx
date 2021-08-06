@@ -1,6 +1,5 @@
 import {Component, NewComponent, NewPost, Post} from "./api";
-import React, {useState} from "react";
-import Config from "./Config";
+import React from "react";
 import {Button, Col, Form, Row} from "react-bootstrap";
 import {ComponentsForm} from "./ComponentsForm";
 
@@ -9,65 +8,21 @@ interface PostFormProps {
     components: (NewComponent | Component)[];
     saveText: string;
 
-    onSaveSuccess(post: NewPost | Post): void;
+    onSave(): void;
 
-    onSaveError(errorMessage: string): void;
+    onChangePost(post: NewPost | Post): void;
+
+    onChangeComponents(components: (Component | NewComponent)[]): void;
 }
 
-export function PostForm({saveText, post, components: initialComponents, onSaveSuccess, onSaveError}: PostFormProps) {
-    const [name, setName] = useState(post.name);
-    const [seoUrl, setSeoUrl] = useState(post.seo_url);
-    const [components, setComponents] = useState<(Component | NewComponent)[]>(initialComponents);
-    const [componentsToDelete, setComponentsToDelete] = useState<Component[]>([]);
-
-    async function save() {
-        if (name === "" || seoUrl === "") {
-            onSaveError("Необходимо заполнить все поля формы");
-            return;
-        }
-
-        post.name = name;
-        post.seo_url = seoUrl;
-
-        try {
-            let postResponse;
-
-            if ("id" in post) {
-                postResponse = await Config.postApi.updatePost((post as Post).id as number, post);
-            } else {
-                postResponse = await Config.postApi.createPost(post);
-            }
-
-            for (const component of components) {
-                if ("id" in component) {
-                    await Config.componentApi.updateComponent(postResponse.data.id as number, (component as Component).id as number, component);
-                } else {
-                    await Config.componentApi.createComponent(postResponse.data.id as number, component as NewComponent);
-                }
-
-            }
-
-            for(const componentToDelete of componentsToDelete){
-                await Config.componentApi.deleteComponent(postResponse.data.id as number, componentToDelete.id as number);
-            }
-
-            onSaveSuccess(postResponse.data);
-        } catch (e) {
-            if (e.response && e.response.status === 422) {
-                onSaveError("Форма заполнена некорректно: " + e.response.data.errors.join(", "));
-            } else {
-                onSaveError("Произошла ошибка во время создания публикации");
-            }
-        }
-    }
-
-    function addComponentToDeleteList(component: NewComponent | Component){
-        if ("id" in component) {
-            let updatedComponentsToDelete = [...componentsToDelete];
-            updatedComponentsToDelete.push(component as Component);
-            setComponentsToDelete(updatedComponentsToDelete);
-        }
-    }
+export function PostForm({
+                                post,
+                                components,
+                                saveText,
+                                onSave,
+                                onChangePost,
+                                onChangeComponents
+                            }: PostFormProps) {
 
     return (
         <div>
@@ -75,24 +30,28 @@ export function PostForm({saveText, post, components: initialComponents, onSaveS
                 <Form.Group as={Row} controlId="name">
                     <Form.Label column sm={2}>Внутреннее название публикации</Form.Label>
                     <Col sm={10}>
-                        <Form.Control placeholder="Amazon увольняет всех сотрудников" value={name}
-                                      onChange={e => setName(e.target.value)}/>
+                        <Form.Control placeholder="Amazon увольняет всех сотрудников"
+                                      value={post.name}
+                                      onChange={e => onChangePost({...post, name: e.target.value})}/>
                     </Col>
                 </Form.Group>
 
                 <Form.Group as={Row} controlId="seoUrl">
                     <Form.Label column sm={2}>Человекочитаемый URL</Form.Label>
                     <Col sm={10}>
-                        <Form.Control placeholder="amazon-fires-all-the-people" value={seoUrl}
-                                      onChange={e => setSeoUrl(e.target.value)}/>
+                        <Form.Control placeholder="amazon-fires-all-the-people"
+                                      value={post.seo_url}
+                                      onChange={e => onChangePost({...post, seo_url: e.target.value})}/>
                     </Col>
                 </Form.Group>
 
-                <ComponentsForm components={components} onChange={setComponents} onDelete={addComponentToDeleteList}/>
+                <ComponentsForm components={components}
+                                onChange={onChangeComponents}
+                                onDelete={f => f}/>
 
                 <Row className="mt-3">
                     <Col>
-                        <Button variant="primary" onClick={save}>{saveText}</Button>
+                        <Button variant="primary" onClick={onSave}>{saveText}</Button>
                     </Col>
                 </Row>
 
