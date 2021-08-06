@@ -9,6 +9,7 @@ export function PostsIndex() {
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingError, setLoadingError] = useState<string | undefined>();
     const [deleteError, setDeleteError] = useState<string | undefined>();
+    const [postsLoaded, setPostsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         // noinspection JSIgnoredPromiseFromCall
@@ -22,6 +23,7 @@ export function PostsIndex() {
         try {
             const postsResponse = await Config.postApi.indexPosts();
             setPosts(postsResponse.data);
+            setPostsLoaded(true);
         } catch {
             setLoadingError('Произошла ошибка при загрузке публикаций');
         }
@@ -58,6 +60,10 @@ export function PostsIndex() {
 
             {loading ? <Spinner animation="border" variant="primary"/> : ''}
 
+            {posts.length === 0 && postsLoaded ? <div>
+                <p>Публикации отсутствуют</p>
+                <Button href="/posts/create" variant="primary">Создать публикацию</Button>
+            </div> : ''}
             {posts.length === 0 ? '' :
                 <Table striped bordered hover>
                     <thead>
@@ -78,7 +84,8 @@ export function PostsIndex() {
                                 <ButtonGroup>
                                     <Button variant="outline-secondary"
                                             href={"/posts/" + post.id}>Редактировать</Button>
-                                    <Button variant="outline-danger" onClick={() => deletePost(i, post)}>Удалить</Button>
+                                    <Button variant="outline-danger"
+                                            onClick={() => deletePost(i, post)}>Удалить</Button>
 
                                 </ButtonGroup>
                             </td>
