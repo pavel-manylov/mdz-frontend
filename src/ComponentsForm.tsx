@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Component, NewComponent, NewComponentTypeEnum, PostReference} from "./api";
 import {ComponentSubForm} from "./ComponentSubForm";
 import {Button, ButtonGroup, Col, Dropdown, Row} from "react-bootstrap";
-import {v4 as uuid} from 'uuid';
 
 interface ComponentsFormParams {
     components: (Component | NewComponent)[];
@@ -12,29 +11,18 @@ interface ComponentsFormParams {
     onDelete(component: Component | NewComponent): void;
 }
 
-interface ComponentWithKey {
-    component: NewComponent | Component;
-    key: string;
-}
-
-export function ComponentsForm({components: initialComponents, onChange, onDelete}: ComponentsFormParams) {
-    const [componentsWithKey, setComponentsWithKey] = useState<ComponentWithKey[]>(
-        initialComponents.map(c => {
-            return {component: c, key: uuid()}
-        })
-    );
-
+export function ComponentsForm({components, onChange, onDelete}: ComponentsFormParams) {
     function addComponent(type: NewComponentTypeEnum, value: string | boolean | PostReference[]) {
-        setComponentsWithKey([...componentsWithKey, {
-            component: {
-                order: componentsWithKey.length > 0 ? (componentsWithKey[componentsWithKey.length - 1].component.order || 0) + 1 : 0,
+        onChange([
+            ...components,
+            {
+                order: components.length > 0 ? (components[components.length - 1].order || 0) + 1 : 0,
                 type: type,
                 value: value,
                 custom_fields: {},
                 public: true
-            },
-            key: uuid()
-        }]);
+            } as NewComponent
+        ]);
     }
 
     function addStringComponent() {
@@ -49,25 +37,26 @@ export function ComponentsForm({components: initialComponents, onChange, onDelet
         addComponent(NewComponentTypeEnum.Relation, [] as PostReference[]);
     }
 
-    function sortByOrder(componentsWithKey: ComponentWithKey[]) {
-        componentsWithKey.sort((a, b) => (a.component.order || 0) - (b.component.order || 0));
+    function sortByOrder(components: (Component|NewComponent)[]) {
+        components.sort((a, b) => (a.order || 0) - (b.order || 0));
     }
 
     function componentChanged(index: number, component: Component | NewComponent) {
-        let newComponentsWithKey: ComponentWithKey[] = [...componentsWithKey];
-        newComponentsWithKey[index] = {component: component as NewComponent, key: componentsWithKey[index].key};
-        sortByOrder(newComponentsWithKey);
-        setComponentsWithKey(newComponentsWithKey);
+        let updatedComponents: (Component|NewComponent)[] = [...components];
+        updatedComponents[index] = component;
+        sortByOrder(updatedComponents);
+        onChange(updatedComponents);
     }
 
     function moveComponent(index: number, newIndex: number) {
-        let newComponentsWithKey: ComponentWithKey[] = [...componentsWithKey];
+        let updatedComponents: (Component|NewComponent)[] = [...components];
 
-        const component = newComponentsWithKey[index];
-        newComponentsWithKey.splice(index, 1);
-        newComponentsWithKey.splice(newIndex, 0, component);
-        newComponentsWithKey.forEach((c, index) => c.component.order = index);
-        setComponentsWithKey(newComponentsWithKey);
+        const component = updatedComponents[index];
+        updatedComponents.splice(index, 1);
+        updatedComponents.splice(newIndex, 0, component);
+        updatedComponents.forEach((c, index) => c.order = index);
+
+        onChange(updatedComponents);
     }
 
     function moveDown(index: number) {
@@ -79,23 +68,19 @@ export function ComponentsForm({components: initialComponents, onChange, onDelet
     }
 
     function deleteComponent(index: number) {
-        const componentToDelete = componentsWithKey[index].component;
+        const componentToDelete = components[index];
 
-        let updatedComponentsWithKey = [...componentsWithKey];
-        updatedComponentsWithKey.splice(index, 1);
-        setComponentsWithKey(updatedComponentsWithKey);
+        let updatedComponents = [...components];
+        updatedComponents.splice(index, 1);
 
+        onChange(updatedComponents);
         onDelete(componentToDelete);
     }
 
-    useEffect(() => {
-        onChange(componentsWithKey.map(c => c.component));
-    }, [componentsWithKey, onChange]);
-
     return (<div>
-        {componentsWithKey.map((componentWithKey, i) =>
-            <ComponentSubForm key={componentWithKey.key}
-                              component={componentWithKey.component}
+        {components.map((component, i) =>
+            <ComponentSubForm key={i}
+                              component={component}
                               onChange={(c) => componentChanged(i, c)}
                               onMoveUp={() => moveUp(i)}
                               onMoveDown={() => moveDown(i)}

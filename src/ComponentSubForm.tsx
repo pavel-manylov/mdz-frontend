@@ -68,7 +68,7 @@ export function ComponentSubForm({component, onChange, onMoveUp, onMoveDown, onD
                 <FormGroup as={Row} controlId="displayClass">
                     <Form.Label column sm={2}>Класс для отображения на клиенте</Form.Label>
                     <Col sm={10}>
-                        <Form.Control value={component.display_class} placeholder="header1" onChange={e => {
+                        <Form.Control value={component.display_class || ''} placeholder="header1" onChange={e => {
                             onChange({...component, display_class: e.target.value});
                         }}/>
                     </Col>
