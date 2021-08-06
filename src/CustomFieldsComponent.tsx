@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Button, Col, FormControl, Row} from "react-bootstrap";
+import {NewCustomField} from "./NewCustomField";
 
 export type CustomFields = { [key: string]: string; };
 
@@ -10,76 +11,50 @@ interface CustomFieldsComponentProps {
 }
 
 export function CustomFieldsComponent({customFields, onChange}: CustomFieldsComponentProps) {
-    const [updatedCustomFields, setUpdatedCustomFields] = useState<CustomFields>(customFields);
-    const [newFieldName, setNewFieldName] = useState<string>("");
-    const [newFieldValue, setNewFieldValue] = useState<string>("");
-
     function updateName(oldName: string, newName: string) {
-        let updated: CustomFields = {...updatedCustomFields};
+        let updated: CustomFields = {...customFields};
         const value = updated[oldName];
         delete updated[oldName];
         updated[newName] = value;
-        setUpdatedCustomFields(updated);
+        onChange(updated);
     }
 
     function updateValue(name: string, newValue: string) {
-        let updated: CustomFields = {...updatedCustomFields};
+        let updated: CustomFields = {...customFields};
         updated[name] = newValue;
-        setUpdatedCustomFields(updated);
+        onChange(updated);
     }
 
     function remove(name: string) {
-        let updated: CustomFields = {...updatedCustomFields};
+        let updated: CustomFields = {...customFields};
         delete updated[name];
-        setUpdatedCustomFields(updated);
+        onChange(updated);
     }
 
-    function addNewField() {
-        let updated: CustomFields = {...updatedCustomFields};
+    function addNewField(newFieldName: string, newFieldValue: string) {
+        let updated: CustomFields = {...customFields};
         updated[newFieldName] = newFieldValue;
-        setUpdatedCustomFields(updated);
-
-        setNewFieldName("");
-        setNewFieldValue("");
+        onChange(updated);
     }
-
-    useEffect(() => {
-        onChange(updatedCustomFields);
-    });
 
     return (
         <div>
-            {Object.keys(updatedCustomFields).map((key, index) =>
+            {Object.keys(customFields).map((key, index) =>
                 <Row key={index} className="mb-2">
                     <Col sm={5}>
                         <FormControl placeholder="Ключ" value={key} onChange={e => updateName(key, e.target.value)}/>
                     </Col>
                     <Col sm={5}>
-                        <FormControl placeholder="Значение" value={updatedCustomFields[key]}
+                        <FormControl placeholder="Значение" value={customFields[key]}
                                      onChange={e => updateValue(key, e.target.value)}/>
                     </Col>
                     <Col sm={2}>
-                        <Button variant="outline-danger" onClick={e => remove(key)}>Удалить</Button>
+                        <Button variant="outline-danger" onClick={() => remove(key)}>Удалить</Button>
                     </Col>
                 </Row>
             )}
 
-            <Row>
-                <Col sm={5}>
-                    <FormControl placeholder="Ключ" value={newFieldName} onChange={e => {
-                        setNewFieldName(e.target.value);
-                    }}/>
-                </Col>
-                <Col sm={5}>
-                    <FormControl placeholder="Значение" value={newFieldValue} onChange={e => {
-                        setNewFieldValue(e.target.value);
-                    }}/>
-                </Col>
-                <Col sm={2}>
-                    <Button variant="outline-secondary" onClick={addNewField}
-                            disabled={newFieldName === "" || newFieldValue === ""}>Добавить</Button>
-                </Col>
-            </Row>
+            <NewCustomField onSubmit={addNewField}/>
         </div>
     );
 }
