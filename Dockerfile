@@ -2,6 +2,7 @@ FROM node:16.6-alpine as build
 RUN mkdir /app
 WORKDIR /app
 COPY . ./
+RUN npm install
 RUN npm run build
 
 FROM nginx:1.20.1
